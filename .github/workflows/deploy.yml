@@ -1,11 +1,11 @@
-name: Deploy To Render
+name: Deployment Pipeline
 
 on:
   release:
     types: [published]
 
 jobs:
-  deploy:
+  test-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,14 +26,5 @@ jobs:
     - name: Run tests
       run: npm test
 
-    - name: Trigger Render deploy hook
-      env:
-        RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-      run: |
-        if [ -z "$RENDER_DEPLOY_HOOK" ]; then
-          echo "RENDER_DEPLOY_HOOK secret is not set."
-          exit 1
-        fi
-
-        curl --fail --show-error --silent "$RENDER_DEPLOY_HOOK"
-        echo "Render deploy hook triggered successfully."
+    - name: Deploy to Render
+      run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
